@@ -12,3 +12,11 @@ html, body, .content {
     display: flex;
     justify-content: center;
 }
+
+.form-content {
+    width: 500px;
+}
+
+label {
+    margin-top: 10px;
+}

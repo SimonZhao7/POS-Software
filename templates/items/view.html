@@ -9,7 +9,7 @@
     {% for item in items %}
         <div class="view-content">
             <label>Price: ${{ item.price }}</label>
-            <button class="btn btn-primary">{{ item.name }}</button>
+            <a href="{% url 'items:add' item.get_slug %}"><button class="btn btn-primary item-button">{{ item.name }}</button></a>
         </div>
     {% endfor %}
 </div>
