@@ -16,7 +16,11 @@ class Item(models.Model):
     price = models.DecimalField(max_digits=100, decimal_places=2)
     column = models.CharField(max_length=3)
     max_quota = models.IntegerField()
-    purchased_items = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+    purchased_items = models.ManyToManyField(Transaction)
+    
+    
+    def __str__(self):
+        return self.name
 
 
 

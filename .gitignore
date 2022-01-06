@@ -1,4 +1,7 @@
-/venv
+# Default
+venv
+
+# Django
 migrations
 *.log
 *.pot
@@ -6,3 +9,7 @@ migrations
 __pycache__
 db.sqlite3
 media
+
+# Google API
+credentials.json
+token.json
