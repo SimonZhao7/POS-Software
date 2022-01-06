@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/account.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <form method="post" class="login-form mt-5">
+        <legend class="text-center">Login</legend>
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="form-actions text-center p-2">
+            <p>Don't have an account? <a href="{% url 'account:register' %}">Register </a>here</p>
+            <button class="btn btn-primary w-25" type="submit">Login</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
