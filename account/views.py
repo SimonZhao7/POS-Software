@@ -8,13 +8,16 @@ from .setup import setup_api
 # Create your views here.
 
 def login(request):
+    if request.user.is_authenticated: 
+        return redirect('items:view')
+    
     form = AuthenticationForm()
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login_user(request, user)
-        return redirect('/') # Temp placeholder
+        return redirect('items:view') # Temp placeholder
     return render(request, 'account/login.html', {'form': form})
             
 def register(request):

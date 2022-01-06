@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/items.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="view-wrapper">
+    {% for item in items %}
+        <div class="view-content">
+            <label>Price: ${{ item.price }}</label>
+            <button class="btn btn-primary">{{ item.name }}</button>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
