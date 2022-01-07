@@ -19,7 +19,7 @@ def login(request):
         if form.is_valid():
             user = form.get_user()
             login_user(request, user)
-        return redirect('items:view') # Temp placeholder
+            return redirect('items:view')
     return render(request, 'account/login.html', {'form': form})
             
 def register(request):
