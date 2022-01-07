@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as login_user, logout as logout_user
 from django.contrib.auth.decorators import login_required
+from .forms import RegisterForm
 from items.models import Item
 from django.conf import settings
 from .setup import setup_api
@@ -22,9 +23,9 @@ def login(request):
     return render(request, 'account/login.html', {'form': form})
             
 def register(request):
-    form = UserCreationForm()
+    form = RegisterForm()
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():      
             # Setup the Spreadsheet
             service = setup_api(settings.SCOPES)
