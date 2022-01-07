@@ -27,11 +27,15 @@
         <p>Total Cost: ${{ total_cost }}</p>
     </div>
     <br>
-    <form class="form-wrapper" style="height: 38px;">
-        {% csrf_token %}
-        <div class="form-actions flex-grow-1">
-            <button class="btn btn-primary w-100">Confirm Transaction</button>
-        </div>
-    </form>
+    {% if total_items %}
+        <form class="form-wrapper" style="height: 38px;">
+            {% csrf_token %}
+            <div class="form-actions flex-grow-1">
+                <button class="btn btn-primary w-100">Confirm Transaction</button>
+            </div>
+        </form>
+    {% else %}
+    <p class="fw-bold fs-5">No items...</p>
+    {% endif %}
 </div>
 {% endblock %}

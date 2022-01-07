@@ -61,7 +61,7 @@ def register(request):
 
             # Setup values with update
             sheet.values().update(spreadsheetId=spreadsheet_id, range=setup_range, valueInputOption='USER_ENTERED', body=update_body).execute()
-            form.save() 
+            form.save(spreadsheet_id) 
             return redirect('account:login')
     return render(request, 'account/register.html', {'form': form})
 
