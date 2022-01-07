@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Item
-from .forms import AddItemsForm, EditItemForm
+from .forms import AddItemsForm, RemoveItemForm, EditItemForm
 
 # Create your views here.
 
@@ -29,6 +29,21 @@ def add(request, slug):
             form.save(request)
             return redirect('items:view')
     return render(request, 'items/add.html', {'form': form, 'cart_count': get_cart_count(request)})
+
+@login_required
+def remove(request, slug):
+    try:
+        item = Item.objects.get(id=Item.get_id(slug))
+    except: 
+        return render(request, '404.html', {'cart_count', get_cart_count(request)})
+    
+    form = RemoveItemForm(item=item, request=request)
+    if request.method == 'POST':
+        form = RemoveItemForm(request.POST, item=item, request=request)
+        if form.is_valid():
+            form.save(request)
+            return redirect('cart:view')
+    return render(request, 'items/remove.html', {'form': form, 'cart_count': get_cart_count(request)})
 
 @login_required
 def edit(request, slug):

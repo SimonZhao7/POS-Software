@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="form-wrapper">
+    <form method="post" class="form-content mt-5">
+        <legend class="text-center">Remove Item</legend>
+        {% csrf_token %}
+        {{ form|crispy }}
+        <div class="form-actions text-center mt-3">
+            <button class="btn btn-primary w-100" type="submit">Remove</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

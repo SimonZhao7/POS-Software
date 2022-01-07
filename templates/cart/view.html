@@ -11,7 +11,7 @@
         <div class="cart-item">
             <div class="cart-header d-flex justify-content-between align-items-center border-bottom">
                 <p class="fw-bold fs-3 m-0">{{ item }}</p>
-                <a href="" class="link-secondary text-decoration-none"><span class="text-end">Remove</span></a>
+                <a href="{% url 'items:remove' item.get_slug %}" class="link-secondary text-decoration-none"><span class="text-end">Remove</span></a>
             </div>
             <div class="d-flex">
                 <p class="flex-grow-1">Price: ${{ item.price }}</p>

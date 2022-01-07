@@ -42,6 +42,7 @@ class AddItemsForm(forms.Form):
         
         if total_predicted_items > item_max_quota:
             raise ValidationError('You have exceeded the max quota by ' + str(total_predicted_items - item_max_quota))
+        return self.cleaned_data
         
     def save(self, request):
         item_name = self.item.name
@@ -51,7 +52,34 @@ class AddItemsForm(forms.Form):
         cart[item_name] = cart.get(item_name, 0) + self.cleaned_data['quantity']
                 
         request.session['cart'] = cart
+        
+        
+class RemoveItemForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.item = kwargs.pop('item')
+        self.cart = kwargs.pop('request').session.get('cart', {})
+        super().__init__(*args, **kwargs)
+        
+    quantity = forms.IntegerField()
+    
+    def clean(self):
+        quantity = self.cleaned_data['quantity']
+        item_quantity = self.cart.get(self.item.name, 0)
+        if item_quantity - quantity < 0:
+            raise ValidationError('You removed more of this specific item than your cart contains')
+        return self.cleaned_data
+    
+    def save(self, request):
+        item_name = self.item.name
+        cart = request.session.get('cart', {})
+        
+        cart[item_name] = cart.get(item_name, 0) - self.cleaned_data['quantity']
+        
+        # Remove completely if zero items
+        if cart[item_name] == 0:
+            del cart[item_name]
             
+        request.session['cart'] = cart
             
 class EditItemForm(ModelForm):
     class Meta:
