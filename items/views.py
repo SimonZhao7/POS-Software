@@ -5,10 +5,14 @@ from .forms import AddItemsForm
 
 # Create your views here.
 
+def get_cart_count(request):
+    cart = request.session.get('cart', [])
+    return len(cart)
+
 @login_required
 def view(request):
     items = Item.objects.all().order_by('column') # Items were created in reverse order
-    return render(request, 'items/view.html', {'items': items})
+    return render(request, 'items/view.html', {'items': items, 'cart_count': get_cart_count(request)})
 
 @login_required
 def add(request, slug):
@@ -24,4 +28,4 @@ def add(request, slug):
             # Adds to cart
             form.save(request)
             return redirect('items:view')
-    return render(request, 'items/add.html', {'form': form})
+    return render(request, 'items/add.html', {'form': form, 'cart_count': get_cart_count(request)})

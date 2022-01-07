@@ -8,9 +8,9 @@
         <legend class="text-center">Register</legend>
         {% csrf_token %}
         {{ form|crispy }}
-        <div class="form-actions text-center p-2">
+        <div class="form-actions text-center mt-3">
             <p>Already have an account? <a href="{% url 'account:login' %}">Login</a> here</p>
-            <button class="btn btn-primary w-25" type="submit">Register</button>
+            <button class="btn btn-primary w-100" type="submit">Register</button>
         </div>
     </form>
 </div>

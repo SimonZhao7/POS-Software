@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'cart',
     'items',
     'crispy_forms',
+    'django_bootstrap_icons',
 ]
 
 MIDDLEWARE = [
@@ -85,10 +86,11 @@ DATABASES = {
     }
 }
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -136,3 +138,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/'
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+
+BS_ICONS_CACHE = os.path.join(STATIC_ROOT, 'icon_cache')

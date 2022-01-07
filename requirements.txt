@@ -4,6 +4,7 @@ cachetools==4.2.4
 certifi==2021.10.8
 charset-normalizer==2.0.10
 Django==4.0.1
+django-bootstrap-icons==0.7.5
 django-crispy-forms==1.13.0
 google-api-core==2.3.2
 google-api-python-client==2.34.0
