@@ -10,6 +10,7 @@
         <div class="view-content">
             <label>Price: ${{ item.price }}</label>
             <a href="{% url 'items:add' item.get_slug %}"><button class="btn btn-primary item-button">{{ item.name }}</button></a>
+            <a href="{% url 'items:edit' item.get_slug %}" class="link-secondary text-decoration-none">Edit</a>
         </div>
     {% endfor %}
 </div>

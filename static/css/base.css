@@ -21,6 +21,11 @@ label {
     margin-top: 10px;
 }
 
+.alert {
+    display: flex;
+    align-items: center;
+}
+
 .cart-count {
     color: black;
     padding: 3px;

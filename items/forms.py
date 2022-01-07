@@ -1,6 +1,7 @@
 from django import forms
+from django.forms import ModelForm
 from django.core.exceptions import ValidationError
-from .models import Transaction, Date, TransactionItem
+from .models import Transaction, Date, TransactionItem, Item
 from django.utils import timezone
 from datetime import timedelta
 
@@ -52,3 +53,15 @@ class AddItemsForm(forms.Form):
             cart.append(new_trans_item.pk)
         request.session['cart'] = cart
             
+            
+class EditItemForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = ['name', 'price', 'max_quota']
+        
+    def save(self, item):
+        item.name = self.cleaned_data['name']
+        item.price = self.cleaned_data['price']
+        item.max_quota = self.cleaned_data['max_quota']
+        item.save()
+        return item
