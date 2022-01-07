@@ -22,8 +22,9 @@ class Date(models.Model):
     
 class Transaction(models.Model):
     total_cost = models.DecimalField(max_digits=100, decimal_places=2)
-    time_occured = models.TimeField()
-    date_occured = models.ForeignKey(Date, on_delete=models.CASCADE)
+    total_items = models.IntegerField()
+    time_occurred = models.TimeField()
+    date_occurred = models.ForeignKey(Date, on_delete=models.CASCADE)
     
     def get_slug(self):
         return self.pk + 236396582
@@ -33,7 +34,7 @@ class Transaction(models.Model):
         return int(slug) - 236396582
     
     def __str__(self):
-        return self.time_occured
+        return str(self.time_occurred)
 
 
 # Static Model with only 12 objects
@@ -55,4 +56,5 @@ class Item(models.Model):
 
 class TransactionItem(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, null=True)
+    quantity = models.IntegerField()
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, null=True, related_name='transaction_items')

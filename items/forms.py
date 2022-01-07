@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
-from .models import Transaction, Date, TransactionItem, Item
+from .models import Transaction, Date, Item
 from django.utils import timezone
 from datetime import timedelta
 
@@ -35,8 +35,8 @@ class AddItemsForm(forms.Form):
         
         # Enforce Max Quota
         item_max_quota = self.item.max_quota
-        all_today_trans = Transaction.objects.filter(date_occured__date=current_date)
-        sold_today = sum([item.transaction_item_set.filter(name=self.item.name).count()] for item in all_today_trans)
+        all_today_trans = Transaction.objects.filter(date_occurred__date=current_date)
+        sold_today = sum(sum(item.quantity for item in trans.transaction_items.filter(item__name=self.item)) for trans in all_today_trans)
         
         total_predicted_items = quantity + sold_today
         

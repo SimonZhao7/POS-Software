@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.utils import timezone
-from items.models import Item, Date
+from items.models import Item, Date, Transaction, TransactionItem
 from items.views import get_cart_count
 from account.setup import setup_api
 from decimal import Decimal
@@ -17,11 +17,20 @@ def cart(request):
     obj_dict = {quantity: Item.objects.get(name=item_name) for item_name, quantity in cart.items()}
     total_items = sum(obj_dict.keys())
     total_cost = sum([quantity * item.price for quantity, item in obj_dict.items()])
+    date = Date.objects.get(date=timezone.now().date())
     
     if request.method == 'POST':
         spreadsheet_id = request.user.spreadsheet_id
         sheets = setup_api(settings.SCOPES).spreadsheets()
         row = Date.objects.get(date=timezone.now().date()).spreadsheet_row
+        
+        # Create transaction
+        transaction = Transaction.objects.create(
+            total_cost=total_cost, 
+            total_items=total_items, 
+            date_occurred=date,
+            time_occurred=timezone.now().time(),
+        )
         
         for quantity, item in obj_dict.items():
             range = 'Sheet1!{col}{row}'.format(col=item.column, row=row)
@@ -47,6 +56,14 @@ def cart(request):
                 valueInputOption='USER_ENTERED',
                 body=update_body
             ).execute()
+            
+            # Add transaction item
+            transaction_item = TransactionItem.objects.create(
+                item=item,
+                quantity=quantity
+            )
+            transaction_item.save()
+            transaction.transaction_items.add(transaction_item)
         
         # Get spreadsheet totals 
         totals_range = 'Sheet1!O{row}:P{row}'.format(row=row)
@@ -75,6 +92,7 @@ def cart(request):
         ).execute()
         
         # Empty Cart and Refresh
+        transaction.save()
         request.session['cart'] = {}
         return redirect('cart:view')
         
