@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth import login as login_user
+from django.contrib.auth import login as login_user, logout as logout_user
+from django.contrib.auth.decorators import login_required
 from items.models import Item
 from django.conf import settings
 from .setup import setup_api
@@ -62,3 +63,8 @@ def register(request):
             form.save() 
             return redirect('account:login')
     return render(request, 'account/register.html', {'form': form})
+
+@login_required
+def logout(request):
+    logout_user(request)
+    return redirect('account:login')

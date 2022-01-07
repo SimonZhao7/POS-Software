@@ -25,10 +25,10 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Logout</a>
+                <a class="nav-link active" aria-current="page" href="{% url 'account:logout' %}">Logout</a>
               </li>
             </ul>
-            {% if user %}
+            {% if user.is_authenticated %}
               <div class="navbar-brand d-flex align-items-center m-0">
                 <a href="#" class="d-flex align-items-center">{% bs_icon 'cart' size="1.25rem" color="white" %}</a>
                 {% if cart_count > 0 %}
