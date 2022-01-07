@@ -19,9 +19,8 @@ def add(request, slug):
     try:
         item = Item.objects.get(pk=Item.get_id(slug))
     except:
-        return redirect('items:view')
+        return render(request, '404.html', {'cart_count': get_cart_count(request)})
     
-    form = AddItemsForm(item=item)
     if request.method == 'POST':
         form = AddItemsForm(request.POST, item=item)
         if form.is_valid():
@@ -30,16 +29,19 @@ def add(request, slug):
             return redirect('items:view')
     return render(request, 'items/add.html', {'form': form, 'cart_count': get_cart_count(request)})
 
+@login_required
 def edit(request, slug):
+    form = EditItemForm()
+    context_data = {'form': form, 'cart_count': get_cart_count(request)}
+    
     try:
         item = Item.objects.get(id=Item.get_id(slug))
     except:
-        return redirect('items:view')
+        return render(request, '404.html', context_data)
     
-    form = EditItemForm()
     if request.method == 'POST':
         form = EditItemForm(request.POST)
         if form.is_valid():
             form.save(item)
             return redirect('items:view')
-    return render(request, 'items/edit.html', {'form': form, 'cart_count': get_cart_count(request)})
+    return render(request, 'items/edit.html', context_data)
