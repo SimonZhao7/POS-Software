@@ -34,23 +34,22 @@ class AddItemsForm(forms.Form):
             new_date = Date.objects.create(date=current_date, spreadsheet_row=2)
         
         # Enforce Max Quota
-        sold_today = 0
+        item_max_quota = self.item.max_quota
         all_today_trans = Transaction.objects.filter(date_occured__date=current_date)
-        for item in all_today_trans:
-            sold_today += item.transaction_item_set.filter(name=self.item.name).count()
+        sold_today = sum([item.transaction_item_set.filter(name=self.item.name).count()] for item in all_today_trans)
         
         total_predicted_items = quantity + sold_today
         
-        if total_predicted_items > self.item.max_quota:
-            raise ValidationError('You have exceeded the max quota by ' + str(total_predicted_items - self.item.max_quota))
-        
+        if total_predicted_items > item_max_quota:
+            raise ValidationError('You have exceeded the max quota by ' + str(total_predicted_items - item_max_quota))
         
     def save(self, request):
-        cart = request.session.get('cart', [])
-        for i in range(self.cleaned_data['quantity']):
-            new_trans_item = TransactionItem.objects.create(item=self.item)
-            new_trans_item.save()
-            cart.append(new_trans_item.pk)
+        item_name = self.item.name
+        cart = request.session.get('cart', {})
+        
+        # Dict {item_name: quantity}
+        cart[item_name] = cart.get(item_name, 0) + self.cleaned_data['quantity']
+                
         request.session['cart'] = cart
             
             

@@ -1,0 +1,7 @@
+.cart-wrapper {
+    margin: auto;
+    width: 60%;
+    height: 90%;
+    overflow-y: scroll;
+    padding: 15px;
+}

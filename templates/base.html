@@ -30,7 +30,7 @@
             </ul>
             {% if user.is_authenticated %}
               <div class="navbar-brand d-flex align-items-center m-0">
-                <a href="#" class="d-flex align-items-center">{% bs_icon 'cart' size="1.25rem" color="white" %}</a>
+                <a href="{% url 'cart:view' %}" class="d-flex align-items-center">{% bs_icon 'cart' size="1.25rem" color="white" %}</a>
                 {% if cart_count > 0 %}
                   <span class="badge bg-light cart-count">{{ cart_count }}</span>
                 {% endif %}

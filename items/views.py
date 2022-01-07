@@ -6,8 +6,8 @@ from .forms import AddItemsForm, EditItemForm
 # Create your views here.
 
 def get_cart_count(request):
-    cart = request.session.get('cart', [])
-    return len(cart)
+    cart = request.session.get('cart', {})
+    return sum(cart.values())
 
 @login_required
 def view(request):
