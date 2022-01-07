@@ -28,7 +28,7 @@
     </div>
     <br>
     {% if total_items %}
-        <form class="form-wrapper" style="height: 38px;">
+        <form class="form-wrapper" method="post" style="height: 38px;">
             {% csrf_token %}
             <div class="form-actions flex-grow-1">
                 <button class="btn btn-primary w-100">Confirm Transaction</button>
