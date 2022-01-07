@@ -14,9 +14,9 @@ def cart(request):
     cart = request.session.get('cart', {})
 
     # Setup Dict For View
-    obj_dict = {quantity: Item.objects.get(name=item_name) for item_name, quantity in cart.items()}
-    total_items = sum(obj_dict.keys())
-    total_cost = sum([quantity * item.price for quantity, item in obj_dict.items()])
+    obj_dict = [[Item.objects.get(name=item_name), quantity] for item_name, quantity in cart.items()]
+    total_items = sum(cart.values())
+    total_cost = sum(item.price * quantity for item, quantity in obj_dict)
     date = Date.objects.get(date=timezone.now().date())
     
     if request.method == 'POST':
@@ -32,7 +32,7 @@ def cart(request):
             time_occurred=timezone.now().time(),
         )
         
-        for quantity, item in obj_dict.items():
+        for item, quantity in obj_dict:
             range = 'Sheet1!{col}{row}'.format(col=item.column, row=row)
             
             # Get spreadsheet count for item

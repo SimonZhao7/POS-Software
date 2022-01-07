@@ -7,7 +7,7 @@
 
 {% block content %}
 <div class="cart-wrapper mt-2 border border-3 border-primary">
-    {% for quantity, item in items.items %}
+    {% for item, quantity in items %}
         <div class="cart-item">
             <div class="cart-header d-flex justify-content-between align-items-center border-bottom">
                 <p class="fw-bold fs-3 m-0">{{ item }}</p>
