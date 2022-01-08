@@ -21,9 +21,9 @@ def add(request, slug):
     except:
         return render(request, '404.html', {'cart_count': get_cart_count(request)})
     
-    form = AddItemsForm(item=item)
+    form = AddItemsForm(item=item, user=request.user)
     if request.method == 'POST':
-        form = AddItemsForm(request.POST, item=item)
+        form = AddItemsForm(request.POST, item=item, user=request.user)
         if form.is_valid():
             # Adds to cart
             form.save(request)

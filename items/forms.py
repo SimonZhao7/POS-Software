@@ -4,10 +4,13 @@ from django.core.exceptions import ValidationError
 from .models import Transaction, Date, Item
 from django.utils import timezone
 from datetime import timedelta
+from account.setup import setup_api
+from django.conf import settings
 
 
 class AddItemsForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
         self.item = kwargs.pop('item')
         super().__init__(*args, *kwargs)
         
@@ -23,15 +26,16 @@ class AddItemsForm(forms.Form):
             day_diff = current_date - recent_date.date 
             
             # Fill in the inactive days
-            for day in range (day_diff.days):
+            for day in range(day_diff.days):
                 new_date = Date.objects.create(
                     date=recent_date.date + timedelta(days=1), 
                     spreadsheet_row=recent_date.spreadsheet_row + 1
                 )
                 new_date.save()
-                recent_date = new_date
+                recent_date = self.save_to_spreadsheet(new_date)
         else:
             new_date = Date.objects.create(date=current_date, spreadsheet_row=2)
+            self.save_to_spreadsheet(new_date)
         
         # Enforce Max Quota
         item_max_quota = self.item.max_quota
@@ -52,6 +56,26 @@ class AddItemsForm(forms.Form):
         cart[item_name] = cart.get(item_name, 0) + self.cleaned_data['quantity']
                 
         request.session['cart'] = cart
+        
+    def save_to_spreadsheet(self, model):
+        sheets = setup_api(settings.SCOPES).spreadsheets()
+        
+        spreadsheet_range = 'Sheet1!A{row}'.format(row=model.spreadsheet_row)
+            
+        update_body = {
+            'range': spreadsheet_range,
+            'values': [
+                [model.date.strftime('%m/%d/%Y')]
+            ]
+        }
+            
+        sheets.values().update(
+            spreadsheetId=self.user.spreadsheet_id, 
+            range=spreadsheet_range,
+            valueInputOption='USER_ENTERED',
+            body=update_body
+        ).execute()
+        return model
         
         
 class RemoveItemForm(forms.Form):
