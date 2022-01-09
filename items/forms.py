@@ -1,11 +1,9 @@
 from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
-from .models import Transaction, Date, Item
+from .models import Transaction, Item
+from .helpers import fill_missing_dates, save_to_spreadsheet
 from django.utils import timezone
-from datetime import timedelta
-from account.setup import setup_api
-from django.conf import settings
 
 
 class AddItemsForm(forms.Form):
@@ -20,22 +18,7 @@ class AddItemsForm(forms.Form):
         quantity = self.cleaned_data['quantity']
         current_date = timezone.now().date()
         
-        # Get or create 
-        if Date.objects.exists():
-            recent_date = Date.objects.latest('date')
-            day_diff = current_date - recent_date.date 
-            
-            # Fill in the inactive days
-            for day in range(day_diff.days):
-                new_date = Date.objects.create(
-                    date=recent_date.date + timedelta(days=1), 
-                    spreadsheet_row=recent_date.spreadsheet_row + 1
-                )
-                new_date.save()
-                recent_date = self.save_to_spreadsheet(new_date)
-        else:
-            new_date = Date.objects.create(date=current_date, spreadsheet_row=2)
-            self.save_to_spreadsheet(new_date)
+        fill_missing_dates(current_date, self.user)
         
         # Enforce Max Quota
         item_max_quota = self.item.max_quota
@@ -56,26 +39,6 @@ class AddItemsForm(forms.Form):
         cart[item_name] = cart.get(item_name, 0) + self.cleaned_data['quantity']
                 
         request.session['cart'] = cart
-        
-    def save_to_spreadsheet(self, model):
-        sheets = setup_api(settings.SCOPES).spreadsheets()
-        
-        spreadsheet_range = 'Sheet1!A{row}'.format(row=model.spreadsheet_row)
-            
-        update_body = {
-            'range': spreadsheet_range,
-            'values': [
-                [model.date.strftime('%m/%d/%Y')]
-            ]
-        }
-            
-        sheets.values().update(
-            spreadsheetId=self.user.spreadsheet_id, 
-            range=spreadsheet_range,
-            valueInputOption='USER_ENTERED',
-            body=update_body
-        ).execute()
-        return model
         
         
 class RemoveItemForm(forms.Form):
@@ -110,9 +73,11 @@ class EditItemForm(ModelForm):
         model = Item
         fields = ['name', 'price', 'max_quota']
         
-    def save(self, item):
+    def save(self, request, item):     
         item.name = self.cleaned_data['name']
         item.price = self.cleaned_data['price']
         item.max_quota = self.cleaned_data['max_quota']
         item.save()
-        return item
+        
+        spreadsheet_range = 'Sheet1!{col}1'.format(col=item.column)
+        return save_to_spreadsheet(request.user.spreadsheet_id, spreadsheet_range, [item.name])

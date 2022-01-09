@@ -58,6 +58,6 @@ def edit(request, slug):
     if request.method == 'POST':
         form = EditItemForm(request.POST)
         if form.is_valid():
-            form.save(item)
+            form.save(request, item)
             return redirect('items:view')
     return render(request, 'items/edit.html', context_data)

@@ -4,8 +4,7 @@ from django.contrib.auth import login as login_user, logout as logout_user
 from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm
 from items.models import Item
-from django.conf import settings
-from .setup import setup_api
+from items.helpers import create_spreadsheet, save_to_spreadsheet
 
 # Create your views here.
 
@@ -27,24 +26,13 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():      
-            # Setup the Spreadsheet
-            service = setup_api(settings.SCOPES)
-
-            sheet = service.spreadsheets()
-            spreadsheet_body = {
-                'properties': {
-                    'title': 'Martin POS Spreadsheet'
-                }
-            }
-            create_response = sheet.create(body=spreadsheet_body).execute()
-
-            # Get spreadsheet id for setup
-            spreadsheet_id = create_response.get('spreadsheetId')
+            # Setup and get spreadsheet id for setup
+            spreadsheet_id = create_spreadsheet()
             setup_range = 'Sheet1!A1:P1'
             
             # Setup items
             setup_cols = 'BCDEFGHIJKLM'
-            setup_values = [['Date', '', 'Daily Revenue', 'Total Items']]
+            setup_values = ['Date', '', 'Daily Revenue', 'Total Items']
             
             for i in range(12, 0, -1):
                 item_text = 'Item #' + str(i)
@@ -52,15 +40,8 @@ def register(request):
                 new_item = Item.objects.create(name=item_text, column=setup_cols[i - 1], price='1.50', max_quota=50)
                 new_item.save()
                 
-                setup_values[0].insert(1, item_text)
-
-            update_body = {
-                "range": setup_range, 
-                "values": setup_values
-            }
-
-            # Setup values with update
-            sheet.values().update(spreadsheetId=spreadsheet_id, range=setup_range, valueInputOption='USER_ENTERED', body=update_body).execute()
+                setup_values.insert(1, item_text)
+            save_to_spreadsheet(spreadsheet_id, setup_range, setup_values)
             form.save(spreadsheet_id) 
             return redirect('account:login')
     return render(request, 'account/register.html', {'form': form})
