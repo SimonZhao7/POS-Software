@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from items.models import Item, Date, Transaction, TransactionItem
 from items.views import get_cart_count
-from items.helpers import save_to_spreadsheet, get_spreadsheet_value
+from items.helpers import save_to_spreadsheet, get_spreadsheet_value, fill_missing_dates
 from decimal import Decimal
 
 # Create your views here.
@@ -15,7 +15,11 @@ def cart(request):
     obj_dict = [[Item.objects.get(name=item_name), quantity] for item_name, quantity in cart.items()]
     total_items = sum(cart.values())
     total_cost = sum(item.price * quantity for item, quantity in obj_dict)
-    date = Date.objects.get(date=timezone.now().date())
+    
+    try:
+        date = Date.objects.get(date=timezone.now().date())
+    except Date.DoesNotExist:
+        date = fill_missing_dates(timezone.now().date(), request.user)
     
     if request.method == 'POST':
         spreadsheet_id = request.user.spreadsheet_id
